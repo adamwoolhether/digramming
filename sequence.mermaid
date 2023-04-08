@@ -1,0 +1,36 @@
+---
+title: User Sign Up Flow
+---
+sequenceDiagram
+    autonumber
+    actor Browser
+    participant SUS as Sign Up Service
+    participant US as User Service
+%%    Dropdown menus will only work on rendered pages.
+    links US: {"Repository": "https://www.google.com"}
+    participant Kafka
+
+%%    `->>` for synchronous calls.
+    Browser->>SUS: GET /sign_up
+%%    Activations demonstrate the 'lifetime' of an interaction. We can also use`+` and `-` for activation/deactivation (see below).
+    activate SUS
+%%    `-->>` for replies.
+    SUS-->>Browser: 200 OK (HTML Page)
+    deactivate SUS
+
+    Browser->>+SUS: POST /sign_up
+    SUS->>SUS: Validate input
+
+%%    Branching logic for happy/unhappy paths.
+    alt invalid input
+        SUS-->>Browser: Error
+    else valid input
+        SUS->>+US: POST /users
+%%    `--)` for asynchronous messages.
+        US--)Kafka: User Created Event Published
+%%    Notes syntax: `Note [Left|Right] of [Node]`
+%%    ex: `Note over US, Kafka: other services take action based on this event`
+        Note left of Kafka: other services take action based on this event
+        US-->>-SUS: 201 Created (User)
+        SUS-->>-Browser: 301 Redirect (Login Page)
+    end
