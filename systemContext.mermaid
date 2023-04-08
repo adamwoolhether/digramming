@@ -1,0 +1,41 @@
+---
+title: "Listing Service C4 Model: System Context"
+---
+%% Three elements of a System Context Diagram:
+%%   - People
+%%   - Software System
+%%   - Supporting software systems
+flowchart TD
+%%    Node definition format: `id["Label/Description"]`
+    User["Premium Member\n [Person]\n
+    A user of the website who has\n purchased a subscription"]
+
+    LS["Listing Service\n [Software System]\n
+    Serves web pages displaying title\n listing to the end user"]
+
+    TS["Title Service\n [Software System]\n
+    Provides an API to retrieve\n title information"]
+
+    RS["Review Service\n [Software System]\n
+    Provides an API to retrieve\n and submit reviews"]
+
+    SS["Search Service\n [Software System]\n
+    Provides and API to search\n for titles"]
+
+%%    Connecting nodes, two formats:
+%%    ParentNode-- "arrow label" -->ChildNode
+%%    ParentNode-->|"arrow label"|ChildNode
+    User-- "Views titles, searches titles\n and reviews titles using" -->LS
+
+    LS-- "Retrieves title information from" -->TS
+    LS-- "Retrieves from and submits reviews to" -->RS
+    LS-- "Searches for titles using" -->SS
+
+%%    Define some formatting:
+    classDef focusSystem fill:#1168bd,stroke:#0b4884,color:#ffffff
+    classDef supportingSystem fill:#666,stroke:#0b4884,color:#ffffff
+    classDef person fill:#08427b,stroke:#052e56,color:#ffffff
+    class User person
+    class LS focusSystem
+    class TS,RS,SS supportingSystem
+
