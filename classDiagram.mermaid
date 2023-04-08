@@ -5,17 +5,29 @@ classDiagram
 %%    }
 %%    Visibility (private/public) is determined with `-` / `+`.
     class UserController {
-        -CreateUserService _createUserService
+        <<Class>>
+        -ICreateUserService _createUserService
         +UserController(CreateUserService createUserService)
         +Create(string email, string usernam) User
     }
+    class ICreateUserService {
+        <<Interface>>
+        +Call(CreateUserRequest, createUserRequest) User
+    }
     class CreateUserService {
+        <<Class>>
         -UserModel _userModel
         -SendWelcomeEmailService _sendWelcomeEmailService
         -Kafka _kafka
         +CreateUserService(UserModel um, SendWelcomeEmailService es, Kafka k)
-        +Call(string email, string username) User
-        -CheckActiveUsers(List~User~ users)
+        +Call(CreateUserRequest createUserRequest) User
+        -CheckActiveUsers(List~User~ users) bool
+    }
+    class CreateUserRequest {
+        +string Email
+        +string Username
+
+        +Validate() bool
     }
     class UserModel {
         +FindUsersByEmail(string email) List~User~
@@ -27,15 +39,57 @@ classDiagram
         +string Email
     }
     class SendWelcomeEmailService {
-        +Call(string email, string username) bool
+        +Call(User user) bool
     }
     class Kafka {
-        +PublishUserCreatedEvent(string email, string username) bool
+        +PublishUserCreatedEvent(User User) bool
     }
 
 %%    Define dependencies with `..>`, where `>` points to the dependent.
+    UserController ..> ICreateUserService: depends on
+    CreateUserService ..|> ICreateUserService: implements
+    UserController ..> CreateUserRequest: depends on
     UserController ..> CreateUserService: depends on
     CreateUserService ..> UserModel: depends on
     UserModel ..> User: depends on
     CreateUserService ..> SendWelcomeEmailService: depends on
     CreateUserService ..> Kafka: depends on
+
+
+
+%%    PRE REFACTOR
+%%    class UserController {
+%%        -CreateUserService _createUserService
+%%        +UserController(CreateUserService createUserService)
+%%        +Create(string email, string usernam) User
+%%    }
+%%    class CreateUserService {
+%%        -UserModel _userModel
+%%        -SendWelcomeEmailService _sendWelcomeEmailService
+%%        -Kafka _kafka
+%%        +CreateUserService(UserModel um, SendWelcomeEmailService es, Kafka k)
+%%        +Call(string email, string username) User
+%%        -CheckActiveUsers(List~User~ users)
+%%    }
+%%    class UserModel {
+%%        +FindUsersByEmail(string email) List~User~
+%%        +CreateUser(string email, string username) User
+%%    }
+%%    class User {
+%%        +int UserId
+%%        +string Username
+%%        +string Email
+%%    }
+%%    class SendWelcomeEmailService {
+%%        +Call(string email, string username) bool
+%%    }
+%%    class Kafka {
+%%        +PublishUserCreatedEvent(string email, string username) bool
+%%    }
+%%
+%%%%    Define dependencies with `..>`, where `>` points to the dependent.
+%%    UserController ..> CreateUserService: depends on
+%%    CreateUserService ..> UserModel: depends on
+%%    UserModel ..> User: depends on
+%%    CreateUserService ..> SendWelcomeEmailService: depends on
+%%    CreateUserService ..> Kafka: depends on
