@@ -1,0 +1,94 @@
+---
+title: "Listing Service C4 Model: Component Diagram"
+---
+flowchart TD
+    classDef container fill:#1168bd,stroke:#0b4884,color:#ffffff
+    classDef externalSystem fill:#666,stroke:#0b4884,color:#ffffff
+    classDef component fill:#85bbf0,stroke:#5d82a8,color:#000000
+
+    Browser["Browser
+    [Web Browser]\n
+    Used by a user to browse\n the website"]
+
+    MA["Mobile Application
+    [Xamarin Application]\n
+    Allows members to view and review
+    titles from their mobile devices"]
+
+    R[("In-Memory Cache
+    [Redis]\n
+    Titles and their reviews\n are cached")]
+
+    K["Message Broker
+    [Kafka]\n
+    Important domain events\n are publish to Kafka"]
+
+    TS["Title Service
+    [Software System]\n
+    Provides an API to retrieve\n
+    title information"]
+
+    RS["Review Service
+    [Software System]\n
+    Provides an API to retrieve\n
+    and submit reviews"]
+
+    SS["Search Service
+    [Software System]\n
+    Provides an API to search\n
+    for titles"]
+
+    TCont["Title Controller
+    [ASP.NET MVC Controller\n
+    Allows users to view details\n about titles"]
+
+    SCont["Search Controller
+    [ASP.NET MVC Controller\n
+    Allows users to search\n for titles"]
+
+    RCont["Review Controller
+    [ASP.NET MVC Controller\n
+    Allows users to read and\n write reviews"]
+
+    TComp["Title Component
+    [ASP.NET Namespace\n
+    Provides information on titles,\n retrieves information from the title service\n and caches titles"]
+
+    SComp["Search Component
+    [ASP.NET Namespace\n
+    Searches titles using the\n search service"]
+
+    RComp["Review Component
+    [ASP.NET Namespace\n
+    Provides review information,\n submits new reviews\n and publishes domain events"]
+
+    Browser-- "Submits requests to\n[HTTPS]" --->TCont
+    MA-- "Submits requests to\n[HTTPS]" --->TCont
+
+    MA-- "Submits requests to\n[HTTPS]" --->SCont
+    Browser-- "Submits requests to\n[HTTPS]" --->SCont
+
+    MA-- "Submits requests to\n[HTTPS]" --->RCont
+    Browser-- "Submits requests to\n[HTTPS]" --->RCont
+
+    subgraph listing-service[Listing Service]
+        TCont--->TComp
+        RCont--->TComp
+        RCont--->RComp
+
+        SCont--->SComp
+    end
+
+    TComp--->TS
+    TComp--->R
+    RComp--->R
+    RComp--->K
+    RComp--->RS
+
+    SComp--->SS
+
+    class MA,R container
+    class SS,RS,TS,K,Browser externalSystem
+    class RComp,SComp,TComp,RCont,SCont,TCont component
+    style listing-service fill:none,stroke:#CCC,stroke-width:2px
+    style listing-service color:#fff,stroke-dasharray: 5 5
