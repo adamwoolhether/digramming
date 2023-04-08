@@ -1,0 +1,32 @@
+---
+title: Streamy Domain Model
+---
+classDiagram
+%%    Associations - A relationship in which at least one entity holds a reference to the other
+%%    but there is no owner and they can exist independently.
+%%    Multiplicity: Remember the cardinality may be confusing at first:
+%%      `a "1" *-- "0..*" b: hash` = a has 0 to many b, b belongs to one a.
+    Title  "1..*" -- "1..*" Genre: is associated with
+    Title: \n\n
+    link Title "http://www.google.com" _blank
+%%    Composite Relationships - There's an owner of the relationship, and children will be
+%%    deleted if the parent is. Solid diamond indicates the 'parent'.
+    Title "1" *-- "0..*" Season: has
+    Title "1" *-- "0..*" Review: has
+%%    Aggregate Relationship - There's an owner of the relationship, but they can exist
+%%    independently of one another. 'Actor' can exist if 'Title' is deleted.
+    Title "0..*" o-- "1..*" Actor: features
+
+%%  Inheritance - Used to define generalizations.
+    TV Show --|> Title: implements
+    Short --|> Title: implements
+    Film --|> Title: implements
+
+%%    Bidirectional association.
+    Viewer "0..*" --> "0..*" Title: watches
+
+    Season "1" *-- "0..*" Review: has
+    Season "1" *-- "1..*" Episode: contains
+
+    Episode "1" *-- "0..*" Review: has
+
