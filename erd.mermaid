@@ -1,0 +1,79 @@
+---
+title: Streamy Entity Relationship Diagram
+---
+
+erDiagram
+%%    For keys that are both primary & foreign keys,
+%%    we need to use a comment to specify this.
+    TITLE {
+        int title_id PK
+        int type_id FK "This is a comment"
+        string name
+        datetime release_date
+    }
+    TITLE_TYPE {
+        int type_id PK
+        string type
+    }
+    ACTOR {
+        int actor_id PK
+        string name
+        date date_of_birth
+    }
+    TITLE_ACTOR {
+        int title_id PK "FK"
+        in actor_id PK "FK"
+    }
+    GENRE {
+        int genre_id PK
+        string name
+    }
+    TITLE_GENRE {
+        int title_id PK "FK"
+        int genre_id PK "FK"
+    }
+    EPISODE {
+        int episode_id PK
+        int season_id FK
+        string name
+        int season_number
+        int episode_number
+        datetime releaste_date
+    }
+    SEASON {
+        int season_id PK
+        int title_id FK
+        int season_number
+        date release_year
+    }
+    REVIEW {
+        int review_id PK
+        int title_id FK
+        int episode_id FK
+        int season_id FK
+        string review_by
+        datetime review_date
+        string review_text
+    }
+%%    Relationships format: `ENTITY_NAME_1 CARDINALITY--CARDINALITY ENTITY_NAME_2:
+%%    4 Cardinality types:
+%%    || - exactly one
+%%    }| - one-to-many
+%%    o{ - zero-to-many
+%%    o| - zero-or-one
+%%    For non-identifying relationship(parent entity's primary key is not
+%%    in the child entity's primary key), use `..`.
+    TITLE }|..|| TITLE_TYPE: has
+    TITLE ||--o{ TITLE_GENRE: "belongs to"
+    TITLE ||--|{ TITLE_ACTOR: features
+    TITLE ||..|{ SEASON: contains
+
+    TITLE_GENRE }o--|| GENRE: references
+
+    TITLE_ACTOR }|--|| ACTOR: references
+
+    EPISODE }|..|| SEASON: contains
+
+    REVIEW }o..o| TITLE: "made against"
+    REVIEW }o..o| EPISODE: "made against"
+    REVIEW }o..o| SEASON: "made against"
