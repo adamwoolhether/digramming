@@ -1,0 +1,72 @@
+---
+title: C4 Model Container Diagram
+---
+flowchart TD
+    User["Premium Member
+    [Person]\n
+    A user of the website who has
+    purchased a subscription"]
+
+    WA["Web Application
+    [.NET Core MVC Application]\n
+    Allows members to view and review titles
+    from a web browser. Also exposes
+    an API for the mobile app"]
+
+    MA["Mobile Application
+    [Xamarin Application]\n
+    Allows members to view and review
+    titles from their mobile devices"]
+
+%%    Available common shapes:
+%%    Circle: `id((label))`, Diamonds: `id{label}`, Datastore: `id(label)`.
+    R[("In-Memory Cache
+    [Redis]\n
+    Titles and their reviews\n are cached")]
+
+    K["Message Broker
+    [Kafka]\n
+    Important domain events\n are publish to Kafka"]
+
+    TS["Title Service
+    [Software System]\n
+    Provides an API to retrieve\n
+    title information"]
+
+    RS["Reviews Service
+    [Software System]\n
+    Provides an API to retrieve\n
+    and submit reviews"]
+
+    SS["Search Service
+    [Software System]\n
+    Provides an API to search\n
+    for titles"]
+
+
+    User-- "Views titles, searches titles\n and reviews titles using [HTTPS]" -->WA
+    User-- "Views titles, searches titles\n and reviews titles using [HTTPS]" -->MA
+
+%%    Sub-graphs allow clear definition of boundaries to differentiate system containers. `subgraph id[Title]`
+%%    Sub-graphs can also demonstrate subroutines in a programming sense.
+    subgraph listing-service[Listing Service]
+        MA-- "Makes API calls to\n[HTTPS]" -->WA
+        WA-- "Reads and writes to\n[Redis Serialization Protocol]" -->R
+    end
+
+%%    `ParentNode-. "arrow text" .->ChildNode` for asynchronous communication.
+    WA-. "Publishes messages to\n[Binary over TCP]" ..->K
+%%    Request an increase in "rank" with an additional hyphen to increase the link-length.
+    WA-- "Makes API calls to\n[HTTPS]" --->TS
+    WA-- "Makes API calls to\n[HTTPS]" --->RS
+    WA-- "Makes API calls to\n[HTTPS]" --->SS
+
+    classDef container fill:#1168bd,stroke:#0b4884,color:#ffffff
+    classDef person fill:#08427b,stroke:#052e56,color:#ffffff
+    classDef supportingSystem fill:#666,stroke:#0b4884,color:#ffffff
+    class User person
+    class WA,MA,R container
+    class TS,RS,SS,K supportingSystem
+%%    Format the subgraph's lines
+    style listing-service fill:none,stroke:#CCC,stroke-width:2px
+    style listing-service color:#fff,stroke-dasharray: 5 5
