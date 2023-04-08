@@ -1,0 +1,41 @@
+classDiagram
+%%    class CLassName {
+%%      -PropertyType propertyName
+%%      +MethodName(MethodParamType methodParam) ReturnType
+%%    }
+%%    Visibility (private/public) is determined with `-` / `+`.
+    class UserController {
+        -CreateUserService _createUserService
+        +UserController(CreateUserService createUserService)
+        +Create(string email, string usernam) User
+    }
+    class CreateUserService {
+        -UserModel _userModel
+        -SendWelcomeEmailService _sendWelcomeEmailService
+        -Kafka _kafka
+        +CreateUserService(UserModel um, SendWelcomeEmailService es, Kafka k)
+        +Call(string email, string username) User
+        -CheckActiveUsers(List~User~ users)
+    }
+    class UserModel {
+        +FindUsersByEmail(string email) List~User~
+        +CreateUser(string email, string username) User
+    }
+    class User {
+        +int UserId
+        +string Username
+        +string Email
+    }
+    class SendWelcomeEmailService {
+        +Call(string email, string username) bool
+    }
+    class Kafka {
+        +PublishUserCreatedEvent(string email, string username) bool
+    }
+
+%%    Define dependencies with `..>`, where `>` points to the dependent.
+    UserController ..> CreateUserService: depends on
+    CreateUserService ..> UserModel: depends on
+    UserModel ..> User: depends on
+    CreateUserService ..> SendWelcomeEmailService: depends on
+    CreateUserService ..> Kafka: depends on
